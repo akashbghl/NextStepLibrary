@@ -108,7 +108,7 @@ export default function RegisterPage() {
   ====================================================== */
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-indigo-50">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-linear-to-b from-emerald-50 via-white to-indigo-50">
 
       {/* Floating Blobs */}
       <div className="absolute -left-40 -top-40 h-96 w-96 rounded-full bg-emerald-300 opacity-30 blur-3xl animate-pulse" />

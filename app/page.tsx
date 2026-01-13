@@ -101,7 +101,7 @@ export default function HomePage() {
 
           {/* Mock Preview */}
           <div className="relative mt-16 overflow-hidden rounded-xl border bg-white shadow-xl">
-            <div className="h-[360px] w-full bg-gradient-to-br from-gray-200 to-gray-100 flex items-center justify-center text-gray-500">
+            <div className="h-90 w-full bg-linear-to-b from-gray-200 to-gray-100 flex items-center justify-center text-gray-500">
               Dashboard Preview Placeholder
             </div>
           </div>

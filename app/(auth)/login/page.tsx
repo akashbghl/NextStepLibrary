@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/hooks/useAuth";
 import { Eye, EyeOff, Lock, Mail, Loader2 } from "lucide-react";
