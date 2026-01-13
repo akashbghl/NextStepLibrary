@@ -48,7 +48,8 @@ export default function Sidebar() {
   return (
     <aside className="flex h-screen w-64 flex-col border-r bg-white">
       {/* Logo */}
-      <div className="flex h-16 items-center justify-center border-b text-xl font-bold">
+      <div className="flex h-16 items-center border-b text-xl font-bold">
+        <img src={'/Nlogowhite.webp'} height={40} width={40} alt="" />
         NextStep Library
       </div>
 

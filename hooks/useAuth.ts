@@ -4,67 +4,70 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: "SUPER_ADMIN" | "MANAGER" | "STAFF";
+    id: string;
+    name: string;
+    email: string;
+    role: "SUPER_ADMIN" | "MANAGER" | "STAFF";
 }
 
 export function useAuth() {
-  const router = useRouter();
+    const router = useRouter();
 
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState<User | null>(null);
+    const [loading, setLoading] = useState(true);
 
-  /* ============================
-      Load user from localStorage
-  ============================ */
+    /* ============================
+        Load user from localStorage
+    ============================ */
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
+    useEffect(() => {
+        const storedUser = localStorage.getItem("user");
 
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    } else {
-      setUser(null);
-    }
+        if (storedUser) {
+            setUser(JSON.parse(storedUser));
+        } else {
+            setUser(null);
+        }
 
-    setLoading(false);
-  }, []);
+        setLoading(false);
+    }, []);
 
-  /* ============================
-      Login
-  ============================ */
+    /* ============================
+        Login
+    ============================ */
 
-  const login = (user: User) => {
-    localStorage.setItem("user", JSON.stringify(user));
-    setUser(user);
-  };
+    const login = (user: User) => {
+        localStorage.setItem("user", JSON.stringify(user));
+        setUser(user);
+    };
 
-  /* ============================
-      Logout
-  ============================ */
+    /* ============================
+        Logout
+    ============================ */
 
-  const logout = async () => {
-    try {
-      // Optional: clear cookie from backend later
-      await fetch("/api/auth/logout", {
-        method: "POST",
-      });
-    } catch {
-      // ignore
-    }
+    const logout = async () => {
+        try {
+            await fetch("/api/auth/logout", {
+                method: "POST",
+                credentials: "include",
+            });
+        } catch {
+            // ignore network errors
+        }
 
-    localStorage.removeItem("user");
-    setUser(null);
-    router.push("/login");
-  };
+        localStorage.removeItem("user");
+        setUser(null);
 
-  return {
-    user,
-    loading,
-    isAuthenticated: !!user,
-    login,
-    logout,
-  };
+        // Hard redirect so middleware re-checks cookie
+        window.location.href = "/";
+    };
+
+
+    return {
+        user,
+        loading,
+        isAuthenticated: !!user,
+        login,
+        logout,
+    };
 }
