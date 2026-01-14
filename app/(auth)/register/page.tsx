@@ -247,10 +247,6 @@ export default function RegisterPage() {
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
-                <Loader2
-                  size={16}
-                  className="animate-spin"
-                />
                 Creating account...
               </span>
             ) : (
