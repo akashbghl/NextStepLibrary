@@ -196,7 +196,6 @@ export default function LoginPage() {
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
-                <Loader2 className="animate-spin" size={16} />
                 Signing in...
               </span>
             ) : (
