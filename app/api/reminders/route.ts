@@ -19,9 +19,7 @@ function getDaysDiff(date: Date) {
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 }
 
-/**
- * Send reminder to one student
- */
+// send reminder to student
 async function notifyStudent(student: any, daysLeft: number) {
   const expiryDate = new Date(
     student.expiryDate
