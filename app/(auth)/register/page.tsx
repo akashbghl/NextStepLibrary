@@ -123,11 +123,11 @@ export default function RegisterPage() {
       >
         {/* Logo */}
         <div className="mb-6 flex items-center justify-center gap-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-black text-white font-bold">
-            N
+          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-black text-white font-bold">
+            F
           </div>
           <h1 className="text-xl font-bold tracking-tight">
-            NextStep
+            FluxiFy
           </h1>
         </div>
 

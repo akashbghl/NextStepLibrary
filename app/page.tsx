@@ -33,7 +33,7 @@ export default function HomePage() {
           <div className="flex items-center gap-2">
             <Sparkles className="text-black" size={22} />
             <span className="text-lg font-bold tracking-tight">
-              NextStep
+              Fluxify.io
             </span>
           </div>
 
@@ -209,7 +209,7 @@ export default function HomePage() {
           <Testimonial
             name="Amit Sharma"
             role="Library Owner"
-            text="NextStep reduced my admin workload by 70%. Everything is automated."
+            text="Fluxify reduced my admin workload by 70%. Everything is automated."
           />
           <Testimonial
             name="Neha Gupta"
@@ -321,7 +321,7 @@ export default function HomePage() {
           FOOTER
       ===================================================== */}
       <footer className="border-t bg-white py-10 text-center text-sm text-gray-500">
-        © {new Date().getFullYear()} NextStep. All rights reserved.
+        © {new Date().getFullYear()} Fluxify | All rights reserved.
       </footer>
     </div>
   );
