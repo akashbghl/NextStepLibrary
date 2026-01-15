@@ -4,6 +4,7 @@ import Student from "@/models/Student";
 import Payment from "@/models/Payment";
 import Attendance from "@/models/Attendance";
 import { requireAuth } from "@/lib/requireAuth";
+import mongoose from "mongoose";
 
 export async function GET() {
   try {
@@ -42,7 +43,7 @@ export async function GET() {
     const revenueAgg = await Payment.aggregate([
       {
         $match: {
-          organizationId,
+          organizationId:new mongoose.Types.ObjectId(organizationId),
           status: "SUCCESS",
         },
       },
@@ -62,7 +63,7 @@ export async function GET() {
     const monthlyRevenue = await Payment.aggregate([
       {
         $match: {
-          organizationId,
+          organizationId: new mongoose.Types.ObjectId(organizationId),
           status: "SUCCESS",
           paidAt: { $gte: sixMonthsAgo },
         },

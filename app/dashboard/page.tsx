@@ -55,7 +55,7 @@ export default function DashboardPage() {
         credentials: "include",
       });
       const data = await res.json();
-
+      console.log(data);
       if (!data.success) {
         throw new Error("Failed to load dashboard");
       }
