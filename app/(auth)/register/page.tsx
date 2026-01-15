@@ -29,6 +29,7 @@ export default function RegisterPage() {
     email: "",
     password: "",
     role: "MANAGER",
+    organizationName: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -154,6 +155,23 @@ export default function RegisterPage() {
               name="name"
               placeholder="Full name"
               value={form.name}
+              onChange={handleChange}
+              required
+              className="w-full rounded-lg border px-10 py-2.5 text-sm outline-none transition focus:border-black focus:ring-2 focus:ring-black/10"
+            />
+          </div>
+
+          {/* Orgnization Name */}
+          <div className="relative">
+            <User
+              size={18}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            />
+
+            <input
+              name="organizationName"
+              placeholder="Organization Name"
+              value={form.organizationName}
               onChange={handleChange}
               required
               className="w-full rounded-lg border px-10 py-2.5 text-sm outline-none transition focus:border-black focus:ring-2 focus:ring-black/10"

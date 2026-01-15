@@ -8,6 +8,8 @@ interface User {
     name: string;
     email: string;
     role: "SUPER_ADMIN" | "MANAGER" | "STAFF";
+    organizationId: string;
+    organizationName: string;
 }
 
 export function useAuth() {

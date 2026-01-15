@@ -9,6 +9,7 @@ export const registerSchema = z.object({
   email: z.string().email("Invalid email"),
   password: z.string().min(6, "Password must be 6+ chars"),
   role: z.enum(["SUPER_ADMIN", "MANAGER", "STAFF"]).optional(),
+  organizationName: z.string().min(3, "Organization name too short"),
 });
 
 export const loginSchema = z.object({

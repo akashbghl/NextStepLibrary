@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
         Date.now();
 
       const organization = await Organization.create({
-        name: `${data.name}'s Organization`,
+        name: data.organizationName,
         slug,
         email: data.email,
       });
@@ -126,9 +126,15 @@ export async function POST(req: NextRequest) {
         organizationId: user.organizationId.toString(),
       });
 
+      // Fetch organization
+      const organization = await Organization.findById(
+        user.organizationId
+      ).select("name slug");
+
       /* ======================
           Set Cookie
       ====================== */
+
       const response = NextResponse.json({
         success: true,
         message: "Login successful",
@@ -138,6 +144,7 @@ export async function POST(req: NextRequest) {
           email: user.email,
           role: user.role,
           organizationId: user.organizationId,
+          organizationName: organization?.name || "Organization",
         },
       });
 
