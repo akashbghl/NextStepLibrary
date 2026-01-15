@@ -2,6 +2,7 @@ import mongoose, { Schema, models, model } from "mongoose";
 
 export interface IAttendance {
   student: mongoose.Types.ObjectId;
+  organizationId: mongoose.Types.ObjectId;   // ✅ Added
   date: Date;
   checkIn: Date;
   checkOut?: Date;
@@ -14,6 +15,16 @@ const AttendanceSchema = new Schema<IAttendance>(
     student: {
       type: Schema.Types.ObjectId,
       ref: "Student",
+      required: true,
+      index: true,
+    },
+
+    /* ===========================
+        Organization Reference
+    ============================ */
+    organizationId: {
+      type: Schema.Types.ObjectId,
+      ref: "Organization",
       required: true,
       index: true,
     },
@@ -45,13 +56,21 @@ const AttendanceSchema = new Schema<IAttendance>(
   }
 );
 
-/**
- * Prevent duplicate attendance per student per day
- */
+/* ===========================
+    Indexes
+=========================== */
+
+// Prevent duplicate attendance per student per day (within same org)
 AttendanceSchema.index(
-  { student: 1, date: 1 },
+  { organizationId: 1, student: 1, date: 1 },
   { unique: true }
 );
+
+// Fast daily attendance per organization
+AttendanceSchema.index({
+  organizationId: 1,
+  date: -1,
+});
 
 const Attendance =
   models.Attendance ||

@@ -3,18 +3,27 @@ import { connectDB } from "@/lib/db";
 import Payment from "@/models/Payment";
 import Student from "@/models/Student";
 import { validate, paymentSchema } from "@/lib/validators";
+import { requireAuth } from "@/lib/requireAuth";
+
 
 /* ============================
-   GET → Fetch payments
+   GET → Fetch payments (ORG SAFE)
 ============================ */
 export async function GET(req: NextRequest) {
   try {
     await connectDB();
 
+    const auth = await requireAuth();   // ✅ Extract from cookie
+    const organizationId = auth.organizationId;
+
     const { searchParams } = new URL(req.url);
     const studentId = searchParams.get("studentId");
 
-    const filter = studentId ? { student: studentId } : {};
+    const filter: any = { organizationId };
+
+    if (studentId) {
+      filter.student = studentId;
+    }
 
     const payments = await Payment.find(filter)
       .populate("student", "name email phone")
@@ -35,27 +44,38 @@ export async function GET(req: NextRequest) {
 }
 
 /* ============================
-   POST → Add payment
+   POST → Add payment (ORG SAFE)
 ============================ */
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
 
+    const auth = await requireAuth();   // ✅ Extract from cookie
+    const organizationId = auth.organizationId;
+
     const body = await req.json();
     const data = validate(paymentSchema, body);
 
-    const student = await Student.findById(data.studentId);
+    // 🔒 Verify student belongs to same organization
+    const student = await Student.findOne({
+      _id: data.studentId,
+      organizationId,
+    });
 
     if (!student) {
       return NextResponse.json(
-        { success: false, message: "Student not found" },
+        {
+          success: false,
+          message: "Student not found or unauthorized",
+        },
         { status: 404 }
       );
     }
 
-    // 💰 Create payment record
+    // 💰 Create payment
     const payment = await Payment.create({
       student: data.studentId,
+      organizationId, // ✅ Inject org
       amount: data.amount,
       mode: data.mode,
       transactionId: data.transactionId,

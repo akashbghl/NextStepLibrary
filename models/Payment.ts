@@ -2,6 +2,7 @@ import mongoose, { Schema, models, model } from "mongoose";
 
 export interface IPayment {
   student: mongoose.Types.ObjectId;
+  organizationId: mongoose.Types.ObjectId;   // ✅ Added
   amount: number;
   mode: "CASH" | "UPI" | "CARD" | "NETBANKING";
   status: "SUCCESS" | "PENDING" | "FAILED";
@@ -16,6 +17,16 @@ const PaymentSchema = new Schema<IPayment>(
     student: {
       type: Schema.Types.ObjectId,
       ref: "Student",
+      required: true,
+      index: true,
+    },
+
+    /* ===========================
+        Organization Reference
+    ============================ */
+    organizationId: {
+      type: Schema.Types.ObjectId,
+      ref: "Organization",
       required: true,
       index: true,
     },
@@ -59,12 +70,24 @@ const PaymentSchema = new Schema<IPayment>(
   }
 );
 
-/**
- * Index for faster reporting queries
- */
-PaymentSchema.index({ student: 1, paidAt: -1 });
+/* ===========================
+    Indexes for Reports
+=========================== */
+
+// Per org revenue reports
+PaymentSchema.index({
+  organizationId: 1,
+  paidAt: -1,
+});
+
+// Student payment history
+PaymentSchema.index({
+  student: 1,
+  paidAt: -1,
+});
 
 const Payment =
-  models.Payment || model<IPayment>("Payment", PaymentSchema);
+  models.Payment ||
+  model<IPayment>("Payment", PaymentSchema);
 
 export default Payment;

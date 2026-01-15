@@ -1,41 +1,50 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import Student from "@/models/Student";
+import { requireAuth } from "@/lib/requireAuth";
 import {
   validate,
   studentCreateSchema,
   studentUpdateSchema,
 } from "@/lib/validators";
 
+
 /* ============================
-   GET → Fetch all students
+   GET → Fetch students (ORG SAFE)
 ============================ */
 export async function GET() {
   try {
     await connectDB();
 
-    const students = await Student.find().sort({
-      createdAt: -1,
-    });
+    const auth = await requireAuth();   // ✅ Extract from cookie
+    const organizationId = auth.organizationId;
+
+    const students = await Student.find({
+      organizationId,
+    }).sort({ createdAt: -1 });
 
     return NextResponse.json({
       success: true,
       students,
     });
   } catch (error: any) {
+    console.error("Fetch Students Error:", error.message);
+
     return NextResponse.json(
       { success: false, message: error.message },
-      { status: 500 }
+      { status: error.message === "Unauthorized" ? 401 : 500 }
     );
   }
 }
 
 /* ============================
-   POST → Create student
+   POST → Create student (ORG SAFE)
 ============================ */
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
+    const auth = await requireAuth();   // ✅ Extract from cookie
+    const organizationId = auth.organizationId;
 
     const body = await req.json();
     const data = validate(studentCreateSchema, body);
@@ -59,6 +68,7 @@ export async function POST(req: NextRequest) {
       ...data,
       startDate,
       expiryDate,
+      organizationId, // ✅ Inject org
     });
 
     return NextResponse.json({
@@ -77,11 +87,14 @@ export async function POST(req: NextRequest) {
 }
 
 /* ============================
-   PUT → Update student
+   PUT → Update student (ORG SAFE)
 ============================ */
 export async function PUT(req: NextRequest) {
   try {
     await connectDB();
+
+    const auth = await requireAuth();   // ✅ Extract from cookie
+    const organizationId = auth.organizationId;
 
     const body = await req.json();
     const { id, ...payload } = body;
@@ -95,15 +108,18 @@ export async function PUT(req: NextRequest) {
 
     const data = validate(studentUpdateSchema, payload);
 
-    const updatedStudent = await Student.findByIdAndUpdate(
-      id,
+    const updatedStudent = await Student.findOneAndUpdate(
+      { _id: id, organizationId }, // ✅ org protected
       data,
       { new: true }
     );
 
     if (!updatedStudent) {
       return NextResponse.json(
-        { success: false, message: "Student not found" },
+        {
+          success: false,
+          message: "Student not found or unauthorized",
+        },
         { status: 404 }
       );
     }
@@ -124,11 +140,14 @@ export async function PUT(req: NextRequest) {
 }
 
 /* ============================
-   DELETE → Remove student
+   DELETE → Remove student (ORG SAFE)
 ============================ */
 export async function DELETE(req: NextRequest) {
   try {
     await connectDB();
+
+    const auth = await requireAuth();   // ✅ Extract from cookie
+    const organizationId = auth.organizationId;
 
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
@@ -140,11 +159,17 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
-    const deletedStudent = await Student.findByIdAndDelete(id);
+    const deletedStudent = await Student.findOneAndDelete({
+      _id: id,
+      organizationId, // ✅ org protected
+    });
 
     if (!deletedStudent) {
       return NextResponse.json(
-        { success: false, message: "Student not found" },
+        {
+          success: false,
+          message: "Student not found or unauthorized",
+        },
         { status: 404 }
       );
     }

@@ -9,6 +9,7 @@ if (!JWT_SECRET) {
 export interface JwtPayload {
   userId: string;
   role: "SUPER_ADMIN" | "MANAGER" | "STAFF";
+  organizationId: string; 
 }
 
 /**

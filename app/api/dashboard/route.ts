@@ -3,49 +3,48 @@ import { connectDB } from "@/lib/db";
 import Student from "@/models/Student";
 import Payment from "@/models/Payment";
 import Attendance from "@/models/Attendance";
+import { requireAuth } from "@/lib/requireAuth";
 
-/* ============================
-   GET → Dashboard Analytics
-============================ */
 export async function GET() {
   try {
     await connectDB();
 
+    const auth = await requireAuth();
+    const organizationId = auth.organizationId;
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const weekLater = new Date();
+    const weekLater = new Date(today);
     weekLater.setDate(today.getDate() + 7);
 
-    /* ======================
-        BASIC COUNTS
-    ====================== */
+    const totalStudents = await Student.countDocuments({
+      organizationId,
+    });
 
-    const totalStudents = await Student.countDocuments();
     const activeStudents = await Student.countDocuments({
+      organizationId,
       status: "ACTIVE",
     });
+
     const expiredStudents = await Student.countDocuments({
+      organizationId,
       status: "EXPIRED",
     });
 
-    /* ======================
-        EXPIRING SOON
-    ====================== */
-
     const expiringSoon = await Student.find({
+      organizationId,
       expiryDate: { $gte: today, $lte: weekLater },
     })
       .select("name phone expiryDate")
       .limit(5);
 
-    /* ======================
-        REVENUE STATS
-    ====================== */
-
     const revenueAgg = await Payment.aggregate([
       {
-        $match: { status: "SUCCESS" },
+        $match: {
+          organizationId,
+          status: "SUCCESS",
+        },
       },
       {
         $group: {
@@ -57,16 +56,15 @@ export async function GET() {
 
     const totalRevenue = revenueAgg[0]?.totalRevenue || 0;
 
-    // Monthly revenue (last 6 months)
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
     const monthlyRevenue = await Payment.aggregate([
       {
         $match: {
+          organizationId,
           status: "SUCCESS",
-          paidAt: {
-            $gte: new Date(
-              new Date().setMonth(new Date().getMonth() - 6)
-            ),
-          },
+          paidAt: { $gte: sixMonthsAgo },
         },
       },
       {
@@ -81,17 +79,10 @@ export async function GET() {
       { $sort: { "_id.year": 1, "_id.month": 1 } },
     ]);
 
-    /* ======================
-        TODAY ATTENDANCE
-    ====================== */
-
     const todayAttendance = await Attendance.countDocuments({
+      organizationId,
       date: today,
     });
-
-    /* ======================
-        RESPONSE
-    ====================== */
 
     return NextResponse.json({
       success: true,
@@ -110,7 +101,7 @@ export async function GET() {
 
     return NextResponse.json(
       { success: false, message: error.message },
-      { status: 500 }
+      { status: 401 }
     );
   }
 }

@@ -6,10 +6,12 @@ export interface IUser {
   email: string;
   password: string;
   role: "SUPER_ADMIN" | "MANAGER" | "STAFF";
+  organizationId: mongoose.Types.ObjectId;   // ✅ ADD THIS
   isActive: boolean;
   createdAt: Date;
   comparePassword?: (password: string) => Promise<boolean>;
 }
+
 
 const UserSchema = new Schema<IUser>(
   {
@@ -40,6 +42,12 @@ const UserSchema = new Schema<IUser>(
       type: String,
       enum: ["SUPER_ADMIN", "MANAGER", "STAFF"],
       default: "MANAGER",
+    },
+    organizationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Organization",
+      required: true,
+      index: true,
     },
 
     isActive: {

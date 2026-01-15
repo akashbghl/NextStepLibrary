@@ -10,6 +10,7 @@ export interface IStudent {
   feesPaid: number;
   pendingFees: number;
   status: "ACTIVE" | "EXPIRED";
+  organizationId: mongoose.Types.ObjectId;   // ✅ Added
   createdAt: Date;
 }
 
@@ -67,6 +68,16 @@ const StudentSchema = new Schema<IStudent>(
       enum: ["ACTIVE", "EXPIRED"],
       default: "ACTIVE",
     },
+
+    /* ===========================
+        Organization Reference
+    ============================ */
+    organizationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Organization",
+      required: true,
+      index: true,
+    },
   },
   {
     timestamps: true,
@@ -78,12 +89,21 @@ const StudentSchema = new Schema<IStudent>(
  */
 StudentSchema.pre("save", function () {
   const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
   if (this.expiryDate < today) {
     this.status = "EXPIRED";
   } else {
     this.status = "ACTIVE";
   }
+});
+
+/* ===========================
+    Compound Index
+=========================== */
+StudentSchema.index({
+  organizationId: 1,
+  expiryDate: 1,
 });
 
 const Student =

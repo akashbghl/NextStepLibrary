@@ -2,21 +2,27 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import Attendance from "@/models/Attendance";
 import Student from "@/models/Student";
+import { requireAuth } from "@/lib/requireAuth";
 
 /* ============================
-   GET → Fetch attendance
+   GET → Fetch attendance (ORG SAFE)
 ============================ */
 export async function GET(req: NextRequest) {
   try {
     await connectDB();
 
+    const auth = await requireAuth();   // ✅ Extract from cookie
+    const organizationId = auth.organizationId;
+
     const { searchParams } = new URL(req.url);
     const studentId = searchParams.get("studentId");
     const date = searchParams.get("date"); // yyyy-mm-dd
 
-    const filter: any = {};
+    const filter: any = { organizationId };
 
-    if (studentId) filter.student = studentId;
+    if (studentId) {
+      filter.student = studentId;
+    }
 
     if (date) {
       const start = new Date(date);
@@ -45,11 +51,14 @@ export async function GET(req: NextRequest) {
 }
 
 /* ============================
-   POST → Check-in
+   POST → Check-in (ORG SAFE)
 ============================ */
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
+
+    const auth = await requireAuth();   // ✅ Extract from cookie
+    const organizationId = auth.organizationId;
 
     const body = await req.json();
     const { studentId, source = "MANUAL" } = body;
@@ -61,11 +70,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const student = await Student.findById(studentId);
+    // 🔒 Verify student belongs to org
+    const student = await Student.findOne({
+      _id: studentId,
+      organizationId,
+    });
 
     if (!student) {
       return NextResponse.json(
-        { success: false, message: "Student not found" },
+        {
+          success: false,
+          message: "Student not found or unauthorized",
+        },
         { status: 404 }
       );
     }
@@ -73,9 +89,10 @@ export async function POST(req: NextRequest) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // Prevent duplicate entry
+    // Prevent duplicate attendance per org
     const alreadyMarked = await Attendance.findOne({
       student: studentId,
+      organizationId,
       date: today,
     });
 
@@ -91,6 +108,7 @@ export async function POST(req: NextRequest) {
 
     const attendance = await Attendance.create({
       student: studentId,
+      organizationId, // ✅ Inject org
       date: today,
       checkIn: new Date(),
       source,
@@ -112,11 +130,14 @@ export async function POST(req: NextRequest) {
 }
 
 /* ============================
-   PUT → Check-out
+   PUT → Check-out (ORG SAFE)
 ============================ */
 export async function PUT(req: NextRequest) {
   try {
     await connectDB();
+
+    const auth = await requireAuth();   // ✅ Extract from cookie
+    const organizationId = auth.organizationId;
 
     const body = await req.json();
     const { attendanceId } = body;
@@ -128,11 +149,17 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    const attendance = await Attendance.findById(attendanceId);
+    const attendance = await Attendance.findOne({
+      _id: attendanceId,
+      organizationId,
+    });
 
     if (!attendance) {
       return NextResponse.json(
-        { success: false, message: "Record not found" },
+        {
+          success: false,
+          message: "Record not found or unauthorized",
+        },
         { status: 404 }
       );
     }

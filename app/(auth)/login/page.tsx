@@ -37,7 +37,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (user) {
-      window.location.href = "/dashboard";
+      router.replace("/dashboard");
     }
   }, [user]);
 
@@ -75,7 +75,7 @@ export default function LoginPage() {
       }
 
       login(data.user);
-      window.location.href = "/dashboard";
+      
     } catch (err: any) {
       setError(
         err.message || "Unable to login. Try again."

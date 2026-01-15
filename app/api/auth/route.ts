@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import User from "@/models/User";
+import Organization from "@/models/Organization";
 import { generateToken } from "@/lib/auth";
 import {
   validate,
@@ -44,17 +45,43 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      const user = await User.create(data);
+      /* ======================
+          Create Organization
+      ====================== */
+
+      const slug =
+        data.name
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-") +
+        "-" +
+        Date.now();
+
+      const organization = await Organization.create({
+        name: `${data.name}'s Organization`,
+        slug,
+        email: data.email,
+      });
+
+      /* ======================
+          Create User
+      ====================== */
+
+      const user = await User.create({
+        ...data,
+        role: "MANAGER",
+        organizationId: organization._id,
+      });
 
       return NextResponse.json(
         {
           success: true,
-          message: "User registered successfully",
+          message: "Organization and user created successfully",
           user: {
             id: user._id,
             name: user.name,
             email: user.email,
             role: user.role,
+            organizationId: organization._id,
           },
         },
         { status: 201 }
@@ -89,27 +116,20 @@ export async function POST(req: NextRequest) {
         );
       }
 
+      /* ======================
+          Generate JWT
+      ====================== */
+
       const token = generateToken({
         userId: user._id.toString(),
         role: user.role,
+        organizationId: user.organizationId.toString(),
       });
 
       /* ======================
-          Set Cookie (Next 16)
+          Set Cookie
       ====================== */
-      const cookieStore = await cookies();
-
-      cookieStore.set({
-        name: "token",
-        value: token,
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7, // 7 days
-      });
-
-      return NextResponse.json({
+      const response = NextResponse.json({
         success: true,
         message: "Login successful",
         user: {
@@ -117,8 +137,23 @@ export async function POST(req: NextRequest) {
           name: user.name,
           email: user.email,
           role: user.role,
+          organizationId: user.organizationId,
         },
       });
+
+      response.cookies.set({
+        name: "token",
+        value: token,
+        httpOnly: true,
+        secure: false,          // ✅ localhost
+        sameSite: "lax",        // ✅ works on localhost
+        path: "/",
+        maxAge: 60 * 60 * 24 * 7,
+      });
+
+      return response;
+
+
     }
 
     return NextResponse.json(
