@@ -12,6 +12,7 @@ export async function GET() {
 
     const auth = await requireAuth();
     const organizationId = auth.organizationId;
+    const organizationObjId = new mongoose.Types.ObjectId(organizationId);
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -20,21 +21,21 @@ export async function GET() {
     weekLater.setDate(today.getDate() + 7);
 
     const totalStudents = await Student.countDocuments({
-      organizationId,
+      organizationId: organizationObjId,
     });
 
     const activeStudents = await Student.countDocuments({
-      organizationId,
+      organizationId: organizationObjId,
       status: "ACTIVE",
     });
 
     const expiredStudents = await Student.countDocuments({
-      organizationId,
+      organizationId: organizationObjId,
       status: "EXPIRED",
     });
 
     const expiringSoon = await Student.find({
-      organizationId,
+      organizationId: organizationObjId,
       expiryDate: { $gte: today, $lte: weekLater },
     })
       .select("name phone expiryDate")
@@ -81,7 +82,7 @@ export async function GET() {
     ]);
 
     const todayAttendance = await Attendance.countDocuments({
-      organizationId,
+      organizationId: organizationObjId,
       date: today,
     });
 

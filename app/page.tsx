@@ -14,6 +14,7 @@ import {
   Clock,
   ChevronDown,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 /* =====================================================
    MAIN PAGE
@@ -21,7 +22,14 @@ import {
 
 export default function HomePage() {
   const router = useRouter();
-
+  const [loggedIn, setLoggedIn] = useState(false);
+  
+  useEffect(() => {
+    const user = localStorage.getItem("user");
+    if (user) {
+      setLoggedIn(true);
+    }
+  }, []);
   return (
     <div className="relative min-h-screen bg-linear-to-br from-gray-50 via-white to-gray-100 text-gray-900">
 
@@ -32,7 +40,7 @@ export default function HomePage() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2">
             <Sparkles className="text-black" size={22} />
-            <span className="text-lg font-bold tracking-tight">
+            <span className="text-lg font-bold tracking-tight cursor-pointer" onClick={() => router.push("/")}>
               Fluxify.io
             </span>
           </div>
@@ -52,7 +60,15 @@ export default function HomePage() {
             </a>
           </nav>
 
-          <div className="flex gap-3">
+          {
+            loggedIn ?
+            <div>
+            <PrimaryButton onClick={() => router.push("/dashboard")}>
+              Go to Dashboard
+            </PrimaryButton>
+            </div>
+            :
+            <div className="flex gap-3">
             <button
               onClick={() => router.push("/login")}
               className="rounded-md px-4 py-2 text-sm font-medium hover:bg-gray-100"
@@ -67,6 +83,8 @@ export default function HomePage() {
               Get Started
             </button>
           </div>
+          
+          }
         </div>
       </header>
 
@@ -113,10 +131,10 @@ export default function HomePage() {
       ===================================================== */}
       <section className="border-t bg-white">
         <div className="mx-auto grid max-w-7xl grid-cols-2 gap-6 px-6 py-16 sm:grid-cols-4">
-          <Stat value="5K+" label="Active Students" />
-          <Stat value="120+" label="Libraries" />
-          <Stat value="99.9%" label="Uptime" />
-          <Stat value="24/7" label="Support" />
+          <Stat value={5000} label="Active Students" />
+          <Stat value={120} label="Libraries" />
+          <Stat value={99.9} label="Uptime" />
+          <Stat value={24} label="Support" />
         </div>
       </section>
 
@@ -296,7 +314,7 @@ export default function HomePage() {
       {/* =====================================================
           CTA
       ===================================================== */}
-      <section className="bg-black py-24 text-white">
+      <section className="bg-gradient-to-br from-gray-600 to-black py-24 text-white">
         <div className="mx-auto max-w-5xl text-center px-6">
           <h2 className="text-3xl font-bold sm:text-4xl">
             Ready to transform your library?
@@ -468,7 +486,7 @@ function PricingCard({
     <div
       className={`rounded-xl border p-6 shadow-sm ${
         highlighted
-          ? "border-black bg-black text-white"
+          ? "border-black bg-gradient-to-br from-gray-600 to-black text-white"
           : "bg-white"
       }`}
     >
@@ -498,22 +516,55 @@ function PricingCard({
 }
 
 function FAQItem({ q, a }: { q: string; a: string }) {
+  const [open, setOpen] = useState(false);
+
   return (
     <div className="rounded-lg border bg-white p-4">
-      <div className="flex items-center justify-between font-medium">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex w-full items-center justify-between font-medium"
+      >
         {q}
-        <ChevronDown size={16} />
-      </div>
-      <p className="mt-2 text-sm text-gray-600">{a}</p>
+        <ChevronDown
+          size={16}
+          className={`transition ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+
+      {open && (
+        <p className="mt-3 text-sm text-gray-600">{a}</p>
+      )}
     </div>
   );
 }
 
-function Stat({ value, label }: { value: string; label: string }) {
+
+function Stat({ value, label }: { value: number; label: string }) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let start = 0;
+    const duration = 1200;
+    const step = Math.ceil(value / (duration / 16));
+
+    const timer = setInterval(() => {
+      start += step;
+      if (start >= value) {
+        setCount(value);
+        clearInterval(timer);
+      } else {
+        setCount(start);
+      }
+    }, 16);
+
+    return () => clearInterval(timer);
+  }, [value]);
+
   return (
     <div className="text-center">
-      <p className="text-2xl font-bold">{value}</p>
+      <p className="text-3xl font-bold">{count}+</p>
       <p className="text-sm text-gray-500">{label}</p>
     </div>
   );
 }
+
