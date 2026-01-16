@@ -69,6 +69,7 @@ export default function EditStudentPage() {
 
     try {
       const res = await fetch("/api/students", {
+        cache: "no-store",
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -86,6 +87,7 @@ export default function EditStudentPage() {
       }
 
       router.push("/dashboard/students");
+      router.refresh();
     } catch (error) {
       alert("Update failed");
     } finally {

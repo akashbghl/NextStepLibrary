@@ -93,7 +93,7 @@ export async function PUT(req: NextRequest) {
   try {
     await connectDB();
 
-    const auth = await requireAuth();   // ✅ Extract from cookie
+    const auth = await requireAuth();
     const organizationId = auth.organizationId;
 
     const body = await req.json();
@@ -108,13 +108,16 @@ export async function PUT(req: NextRequest) {
 
     const data = validate(studentUpdateSchema, payload);
 
-    const updatedStudent = await Student.findOneAndUpdate(
-      { _id: id, organizationId }, // ✅ org protected
-      data,
-      { new: true }
-    );
+    /* ============================
+       Fetch existing student
+    ============================ */
 
-    if (!updatedStudent) {
+    const existingStudent = await Student.findOne({
+      _id: id,
+      organizationId,
+    });
+
+    if (!existingStudent) {
       return NextResponse.json(
         {
           success: false,
@@ -123,6 +126,53 @@ export async function PUT(req: NextRequest) {
         { status: 404 }
       );
     }
+
+    /* ============================
+       Recalculate expiryDate
+    ============================ */
+
+    const PLAN_MAP: Record<string, number> = {
+      "1_MONTH": 1,
+      "3_MONTH": 3,
+      "6_MONTH": 6,
+      "12_MONTH": 12,
+    };
+
+    const startDate = data.startDate
+      ? new Date(data.startDate)
+      : existingStudent.startDate;
+
+    const plan = data.plan ?? existingStudent.plan;
+
+    const expiryDate = new Date(startDate);
+    expiryDate.setMonth(
+      expiryDate.getMonth() + PLAN_MAP[plan]
+    );
+
+    /* ============================
+       Recalculate status
+    ============================ */
+
+    const today = new Date();
+    const status =
+      expiryDate < today ? "EXPIRED" : "ACTIVE";
+
+    /* ============================
+       Final update payload
+    ============================ */
+
+    const updatePayload = {
+      ...data,
+      startDate,
+      expiryDate,
+      status,
+    };
+
+    const updatedStudent = await Student.findOneAndUpdate(
+      { _id: id, organizationId },
+      updatePayload,
+      { new: true }
+    );
 
     return NextResponse.json({
       success: true,
@@ -138,6 +188,7 @@ export async function PUT(req: NextRequest) {
     );
   }
 }
+
 
 /* ============================
    DELETE → Remove student (ORG SAFE)

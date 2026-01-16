@@ -144,9 +144,11 @@ export default function Navbar() {
                         }`}
                       >
                         {/* Unread dot */}
-                        {!n.read && (
+                        {!n.read ? 
                           <span className="mt-1 h-2 w-2 rounded-full bg-indigo-500" />
-                        )}
+                          :
+                          <div className="ml-2 "></div>
+                        }
 
                         <div className="flex-1">
                           <p className="font-medium leading-tight">
