@@ -106,8 +106,8 @@ export default function DashboardPage() {
 
   return (
     <ProtectedRoute>
-      <div className="space-y-8">
-
+      <div className="
+      space-y-6 px-4 pb-20 pt-4 md:px-6 md:pb-6 transition-all">
         {/* ================= Header ================= */}
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
@@ -130,7 +130,7 @@ export default function DashboardPage() {
         </div>
 
         {/* ================= Stats ================= */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-5">
+        <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           <StatCard
             title="Total Students"
             value={stats.totalStudents}
@@ -168,9 +168,9 @@ export default function DashboardPage() {
         </div>
 
         {/* ================= Content ================= */}
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
           {/* Revenue */}
-          <div className="xl:col-span-2 rounded-2xl border bg-white p-5 shadow-sm">
+          <div className="lg:col-span-2 rounded-2xl border bg-white p-4 sm:p-5 shadow-sm">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="font-semibold">
                 Revenue Trends
@@ -192,7 +192,7 @@ export default function DashboardPage() {
                 🎉 No upcoming expiries
               </div>
             ) : (
-              <ul className="space-y-3">
+              <ul className="space-y-3 max-h-[300px] overflow-auto pr-1">
                 {expiringSoon.map((s) => (
                   <li
                     key={s._id}
@@ -238,8 +238,8 @@ function StatCard({
   gradient: string;
 }) {
   return (
-    <div className="group relative overflow-hidden rounded-2xl border bg-white p-4 shadow-sm transition hover:shadow-md">
-      <div
+    <div className="group relative overflow-hidden rounded-xl sm:rounded-2xl border bg-white p-3 sm:p-4 shadow-sm transition hover:shadow-md">
+    <div
         className={`absolute inset-0 opacity-10 bg-gradient-to-br ${gradient}`}
       />
 
@@ -248,7 +248,7 @@ function StatCard({
           <p className="text-xs text-gray-500">
             {title}
           </p>
-          <p className="mt-1 text-2xl font-semibold">
+          <p className="mt-1 text-xl sm:text-2xl font-semibold">
             {value}
           </p>
         </div>
