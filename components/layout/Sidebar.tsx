@@ -59,7 +59,7 @@ export default function Sidebar() {
 
   const [collapsed, setCollapsed] = useState(false);
 
-  
+
   useEffect(() => {
     const width = collapsed ? "5rem" : "16rem";
     document.documentElement.style.setProperty(
@@ -67,7 +67,7 @@ export default function Sidebar() {
       width
     );
   }, [collapsed]);
-  
+
   return (
     <>
       {/* ================= DESKTOP SIDEBAR ================= */}
@@ -79,13 +79,9 @@ export default function Sidebar() {
       >
         {/* Logo */}
         <div className="relative flex h-16 items-center gap-3 border-b px-4">
-          <img
-            src="/Nlogowhite.webp"
-            height={36}
-            width={36}
-            alt="logo"
-            className="rounded-md"
-          />
+          <div className="flex h-8 w-8 items-center justify-center rounded-tr-md rounded-bl-md bg-black text-sm font-semibold text-white">
+            {user?.organizationName?.[0] || "O"}
+          </div>
 
           {!collapsed && (
             <div className="leading-tight">
