@@ -2,11 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  const token = req.cookies.get("token")?.value;  
+  const token = req.cookies.get("token")?.value;
 
   const isPublicApi = pathname.startsWith("/api/auth");
   const isDashboard = pathname.startsWith("/dashboard");
   const isApiRoute = pathname.startsWith("/api");
+
+  const isCronRoute =
+    pathname.startsWith("/api/cron");
+
+  if (isCronRoute) {
+    return NextResponse.next();   // allow without auth
+  }
+
 
   // Allow auth API
   if (isPublicApi) {

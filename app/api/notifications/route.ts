@@ -50,7 +50,6 @@ export async function GET() {
           today.getTime()) /
           (1000 * 60 * 60 * 24)
       );
-      console.log("Students:",s);
       return {
         id: s._id.toString(),
         title: "Subscription Expiring",

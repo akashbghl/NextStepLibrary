@@ -23,6 +23,7 @@ export async function GET() {
       organizationId,
     }).sort({ createdAt: -1 });
 
+
     return NextResponse.json({
       success: true,
       students,

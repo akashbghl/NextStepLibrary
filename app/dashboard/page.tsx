@@ -206,11 +206,21 @@ export default function DashboardPage() {
                         {s.phone}
                       </p>
                     </div>
+                    <div className="flex flex-col gap-2">
                     <span className="rounded-full bg-orange-100 px-2 py-1 text-xs text-orange-700">
                       {new Date(
                         s.expiryDate
                       ).toLocaleDateString()}
                     </span>
+                      <span className="text-xs text-gray-500">
+                      {/* days left   */}
+                        {Math.ceil(
+                          (new Date(s.expiryDate).getTime() -
+                            new Date().setHours(0, 0, 0, 0)) /
+                          (1000 * 60 * 60 * 24)
+                        )} days left
+                      </span>
+                    </div>
                   </li>
                 ))}
               </ul>
