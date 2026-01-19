@@ -15,6 +15,12 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();   // allow without auth
   }
 
+  const isReminderRoute =
+    pathname.startsWith("/api/reminders");
+  if (isReminderRoute) {
+    return NextResponse.next();   // allow without auth
+  }
+
 
   // Allow auth API
   if (isPublicApi) {

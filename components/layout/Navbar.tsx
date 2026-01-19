@@ -197,7 +197,7 @@ export default function Navbar() {
                   (window.location.href =
                     "/dashboard/settings")
                 }
-                className="flex w-full items-center gap-2 px-4 py-2 text-sm hover:bg-gray-100"
+                className="flex w-full items-center gap-2 px-4 py-2 text-sm rounded-xl hover:bg-gray-100"
               >
                 <User size={16} />
                 Profile Settings
@@ -205,7 +205,7 @@ export default function Navbar() {
 
               <button
                 onClick={logout}
-                className="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                className="flex w-full items-center gap-2 px-4 py-2 text-sm rounded-xl text-red-600 hover:bg-gray-100"
               >
                 <LogOut size={16} />
                 Logout
