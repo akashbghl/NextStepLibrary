@@ -5,6 +5,7 @@ export interface IOrganization {
   slug: string; // unique public identifier
   email?: string;
   phone?: string;
+  logo?: string;
   isActive: boolean;
   createdAt: Date;
 }
@@ -27,6 +28,12 @@ const OrganizationSchema = new Schema<IOrganization>(
 
     email: String,
     phone: String,
+    
+    logo: {
+      type: String,
+      default: "",
+    },
+
 
     isActive: {
       type: Boolean,

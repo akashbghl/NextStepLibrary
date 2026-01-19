@@ -53,11 +53,14 @@ const navItems = [
    SIDEBAR
 ====================================================== */
 
+
 export default function Sidebar() {
   const pathname = usePathname();
   const { logout, user } = useAuth();
 
   const [collapsed, setCollapsed] = useState(false);
+  console.log("ORG LOGO:", user?.organizationLogo);
+
 
 
   useEffect(() => {
@@ -79,13 +82,23 @@ export default function Sidebar() {
       >
         {/* Logo */}
         <div className="relative flex h-16 items-center gap-3 border-b px-4">
-          <div className="flex h-8 w-8 items-center justify-center rounded-tr-md rounded-bl-md bg-black text-sm font-semibold text-white">
-            {user?.organizationName?.[0] || "O"}
-          </div>
+
+          {user?.organizationLogo ? (
+            <img
+              src={user.organizationLogo}
+              className="h-9 w-9 rounded-md object-cover"
+              alt="Organization Logo"
+            />
+          ) : (
+            <div className="flex h-8 w-8 items-center justify-center rounded-tr-md rounded-bl-md bg-black text-sm font-semibold text-white">
+              {user?.organizationName?.[0]?.toUpperCase() || "O"}
+            </div>
+          )}
+          
 
           {!collapsed && (
             <div className="leading-tight">
-              <p className="text-sm font-semibold">
+              <p className="text-sm font-semibold truncate max-w-[140px]">
                 {user?.organizationName || "Organization"}
               </p>
               <p className="text-xs text-gray-500">
@@ -96,16 +109,14 @@ export default function Sidebar() {
 
           {/* Collapse Toggle */}
           <button
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             onClick={() => setCollapsed(!collapsed)}
             className="absolute -right-3 top-1/2 -translate-y-1/2 rounded-full border bg-white p-1 shadow hover:bg-gray-50"
           >
-            {collapsed ? (
-              <ChevronRight size={16} />
-            ) : (
-              <ChevronLeft size={16} />
-            )}
+            {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
           </button>
         </div>
+
 
         {/* Navigation */}
         <nav className="flex flex-1 flex-col gap-1 p-3">

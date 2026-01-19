@@ -82,6 +82,8 @@ export async function POST(req: NextRequest) {
             email: user.email,
             role: user.role,
             organizationId: organization._id,
+            organizationName: organization.name,
+            organizationLogo: organization.logo,
           },
         },
         { status: 201 }
@@ -129,7 +131,7 @@ export async function POST(req: NextRequest) {
       // Fetch organization
       const organization = await Organization.findById(
         user.organizationId
-      ).select("name slug");
+      ).select("name slug logo ");
 
       /* ======================
           Set Cookie
@@ -145,6 +147,7 @@ export async function POST(req: NextRequest) {
           role: user.role,
           organizationId: user.organizationId,
           organizationName: organization?.name || "Organization",
+          organizationLogo: organization?.logo || "",
         },
       });
 

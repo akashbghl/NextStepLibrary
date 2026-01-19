@@ -10,6 +10,7 @@ interface User {
     role: "SUPER_ADMIN" | "MANAGER" | "STAFF";
     organizationId: string;
     organizationName: string;
+    organizationLogo: string;
 }
 
 export function useAuth() {
@@ -64,6 +65,16 @@ export function useAuth() {
         window.location.href = "/";
     };
 
+    const refreshUser = async () => {
+        const res = await fetch("/api/auth/me", {
+            credentials: "include",
+        });
+        const data = await res.json();
+        if (data.success) {
+            setUser(data.user);
+            localStorage.setItem("user", JSON.stringify(data.user));
+        }
+    };
 
     return {
         user,
@@ -71,5 +82,6 @@ export function useAuth() {
         isAuthenticated: !!user,
         login,
         logout,
+        refreshUser,
     };
 }
