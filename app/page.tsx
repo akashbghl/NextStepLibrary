@@ -15,6 +15,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import {StickyBanner} from "@/components/layout/StickyBanner";
 
 /* =====================================================
    MAIN PAGE
@@ -23,7 +24,8 @@ import { useEffect, useState } from "react";
 export default function HomePage() {
   const router = useRouter();
   const [loggedIn, setLoggedIn] = useState(false);
-  
+   const [visible, setVisible] = useState(true);
+
   useEffect(() => {
     const user = localStorage.getItem("user");
     if (user) {
@@ -32,6 +34,16 @@ export default function HomePage() {
   }, []);
   return (
     <div className="relative min-h-screen bg-linear-to-br from-gray-50 via-white to-gray-100 text-gray-900">
+      {/* Promo Banner */}
+      {visible && (
+        <StickyBanner
+        isVisible={visible}
+        onClose={() => setVisible(false)}
+        className="bg-gradient-to-r from-green-800/80 to-blue-900/90 text-white text-sm"
+      >
+        🎉 Flat 50% OFF — Use code <b className="mx-2">FLUX50</b> today!
+      </StickyBanner>
+      )}
 
       {/* =====================================================
           NAVBAR
@@ -62,28 +74,28 @@ export default function HomePage() {
 
           {
             loggedIn ?
-            <div>
-            <PrimaryButton onClick={() => router.push("/dashboard")}>
-              Go to Dashboard
-            </PrimaryButton>
-            </div>
-            :
-            <div className="flex gap-3">
-            <button
-              onClick={() => router.push("/login")}
-              className="rounded-md px-4 py-2 text-sm font-medium hover:bg-gray-100"
-            >
-              Login
-            </button>
+              <div>
+                <PrimaryButton onClick={() => router.push("/dashboard")}>
+                  Go to Dashboard
+                </PrimaryButton>
+              </div>
+              :
+              <div className="flex gap-3">
+                <button
+                  onClick={() => router.push("/login")}
+                  className="rounded-md px-4 py-2 text-sm font-medium hover:bg-gray-100"
+                >
+                  Login
+                </button>
 
-            <button
-              onClick={() => router.push("/register")}
-              className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
-            >
-              Get Started
-            </button>
-          </div>
-          
+                <button
+                  onClick={() => router.push("/register")}
+                  className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+                >
+                  Get Started
+                </button>
+              </div>
+
           }
         </div>
       </header>
@@ -484,11 +496,10 @@ function PricingCard({
 }) {
   return (
     <div
-      className={`rounded-xl border p-6 shadow-sm ${
-        highlighted
+      className={`rounded-xl border p-6 shadow-sm ${highlighted
           ? "border-black bg-gradient-to-br from-gray-600 to-black text-white"
           : "bg-white"
-      }`}
+        }`}
     >
       <h3 className="font-semibold">{title}</h3>
       <p className="mt-2 text-2xl font-bold">{price}</p>
@@ -503,11 +514,10 @@ function PricingCard({
       </ul>
 
       <button
-        className={`mt-6 w-full rounded-md px-4 py-2 text-sm font-medium ${
-          highlighted
+        className={`mt-6 w-full rounded-md px-4 py-2 text-sm font-medium ${highlighted
             ? "bg-white text-black hover:bg-gray-200"
             : "border hover:bg-gray-100"
-        }`}
+          }`}
       >
         Choose Plan
       </button>
